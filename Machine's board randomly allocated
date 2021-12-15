@@ -10,19 +10,20 @@ import random
 barcos_esloras = [1,1,1,1,2,2,2,3,3,4]  #lista con los barcos y sus esloras para recorrerla con un for y colocarlos en el tablero
 tablero_defensa_maquina = np.full((10,10), ' ')
 
-def pinta_tablero(tablero):
 #FUNCION PARA MOSTRAR UN TABLERO POR PANTALLA. 
 #VARIABLES: LA ENTRADA ES EL NOMBRE DE LA VARIABLE DEL TABLERO QUE QUIERAS
 
-    print('\nCREA UN TABLERO MOLON CON INDICE Y CON ( )\n')
+def pinta_tablero(tablero):
     print("  A B C D E F G H I J")
     print("  --------------------")
     num_colu = 0
     for columna in tablero:
         print("%d|%s|" % (num_colu, "|".join(columna)))
         num_colu += 1
+    print('\n')
     return
-    
+
+print('\nTABLERO DEFENSA DE LA MAQUINA\n')    
 pinta_tablero(tablero_defensa_maquina)
 
 #print('\nCREA UN TABLERO CON INDICE Y CON ( )\n')
@@ -30,10 +31,10 @@ pinta_tablero(tablero_defensa_maquina)
 
 
 def coloca_barcos_ale(tablero):
-#FUNCION: COLOCAMOS LOS BARCOS ALEATORIOS DE LA MAQUINA
-#VARIABLES: LA ENTRADA ES EL NOMBRE DE LA VARIABLE DEL TABLERO QUE QUIERAS
+    #FUNCION: COLOCAMOS LOS BARCOS DE LA MAQUINA DE FORMA ALEATORIA
+    #VARIABLES: LA ENTRADA ES EL NOMBRE DE LA VARIABLE DEL TABLERO QUE QUIERAS
     
-    #BUCLE A TRAVES DE LAS ESLORAS DE LOS BARCOS
+    #BUCLE A TRAVES DE LAS ESLORAS D
     for barco_len in barcos_esloras:
     
         #HACEMOS UN BUCLE PARA COMPROBAR QUE EL BARCO CABE Y NO PISA A OTRO BARCO. SI SE CUMPLEN, COLOCAMOS
@@ -46,13 +47,28 @@ def coloca_barcos_ale(tablero):
                 #LLAMAMOS A LA FUNCION BARCO_SUPERPUESTO
                 if barco_superpuesto(tablero, fila, columna, direccion, barco_len) == False: 
                     
-                    #COLOCAMOS BARCO
+                    #COLOCAMOS BARCO, CADA POSICION SE REPRESENTA CON LA INICIAL DE CADA TIPO DE BARCO:
+                    #F:FRAGATA, D:DESTRUCTOR, A:ACORAZADO, P:PORTAAVIONES
                     if direccion == 'horizontal':
                         for i in range(columna, columna + barco_len):
-                            tablero[fila][i] = 'O'
+                            if barco_len == 1:
+                                tablero[fila][i] = 'F'
+                            elif barco_len == 2:
+                                tablero[fila][i] = 'D'
+                            elif barco_len == 3:
+                                tablero[fila][i] = 'A'
+                            elif barco_len == 4:
+                                tablero[fila][i] = 'P'
                     else:
                         for i in range(fila, fila + barco_len):
-                            tablero[i][columna] = 'O'
+                            if barco_len == 1:
+                                tablero[i][columna] = 'F'
+                            elif barco_len == 2:
+                                tablero[i][columna] = 'D'
+                            elif barco_len == 3:
+                                tablero[i][columna] = 'A'
+                            elif barco_len == 4:
+                                tablero[i][columna] = 'P'
                     break
                 
                 
@@ -76,15 +92,16 @@ def barco_superpuesto(tablero, fila, columna, direccion, barco_len):
 #VARIABLES DE ENTRADA: TABLERO QUE QUEREMOS USAR, FILA SELECCIONADA, COLUMNA, DIRECCION Y LONGITUD DEL BARCO
     if direccion == 'horizontal':
         for i in range(columna, columna + barco_len):
-            if tablero[fila][i] == 'O':
+            if tablero[fila][i] == 'F' or tablero[fila][i] == 'D' or tablero[fila][i] == 'A' or tablero[fila][i] == 'P':
                 return True
     else:
         for i in range(fila, fila + barco_len):
-            if tablero[i][columna] == 'O':
+            if tablero[i][columna] == 'F' or tablero[i][columna] == 'D' or tablero[i][columna] == 'A' or tablero[i][columna] == 'P':
                 return True
     return False
 
 #LLAMAMOS A LA FUNCION coloca_barcos_ale PARA COLOCAR LOS BARCOS
 coloca_barcos_ale(tablero_defensa_maquina)
 
+#LLAMAMOS A LA FUNCION pinta_tablero PARA MOSTRAR EL TABLERO CON LOS BARCOS COLOCADOS DE FORMA ALEATORIA
 pinta_tablero(tablero_defensa_maquina)
