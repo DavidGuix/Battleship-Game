@@ -1,107 +1,90 @@
-#HUNDIR LA FLOTA
-#CODIGO DE DAVID
-#INSERTAR BARCOS DE FORMA ALEATORIA
-
 #LIBRERIAS A IMPORTAR
 import numpy as np
 import random
+import pandas as pd
 
 #VARIABLES CONSTANTES PARA TODAS LAS FUNCIONES
-barcos_esloras = [1,1,1,1,2,2,2,3,3,4]  #lista con los barcos y sus esloras para recorrerla con un for y colocarlos en el tablero
-tablero_defensa_maquina = np.full((10,10), ' ')
+barcos_esloras = [1,1,1,1,2,2,2,3,3,4]  #lista con los barcos y sus esloras para recorrerla con un for y colocarlos en el self.mapa
 
-#FUNCION PARA MOSTRAR UN TABLERO POR PANTALLA. 
-#VARIABLES: LA ENTRADA ES EL NOMBRE DE LA VARIABLE DEL TABLERO QUE QUIERAS
-
-def pinta_tablero(tablero):
-    print("  A B C D E F G H I J")
-    print("  --------------------")
-    num_colu = 0
-    for columna in tablero:
-        print("%d|%s|" % (num_colu, "|".join(columna)))
-        num_colu += 1
-    print('\n')
-    return
-
-print('\nTABLERO DEFENSA DE LA MAQUINA\n')    
-pinta_tablero(tablero_defensa_maquina)
-
-#print('\nCREA UN TABLERO CON INDICE Y CON ( )\n')
-#print(tablero_defensa_maquina, '\n')
-
-
-def coloca_barcos_ale(tablero):
-    #FUNCION: COLOCAMOS LOS BARCOS DE LA MAQUINA DE FORMA ALEATORIA
-    #VARIABLES: LA ENTRADA ES EL NOMBRE DE LA VARIABLE DEL TABLERO QUE QUIERAS
+class Tablero:
+    mapa = pd.DataFrame(np.array(100*['.']).reshape(len(coord_long) , len(coord_lat)) , index=coord_lat , columns=coord_long)
     
-    #BUCLE A TRAVES DE LAS ESLORAS D
-    for barco_len in barcos_esloras:
+    def __init__(self, coord_long, coord_lat):
+        self.coord_long = coord_long
+        self.coord_lat = coord_lat
+        #mapa = pd.DataFrame(np.array(100*['.']).reshape(len(coord_long) , len(coord_lat)) , index=coord_lat , columns=coord_long)
     
-        #HACEMOS UN BUCLE PARA COMPROBAR QUE EL BARCO CABE Y NO PISA A OTRO BARCO. SI SE CUMPLEN, COLOCAMOS
-        while True:
-            direccion, fila, columna = random.choice(['horizontal', 'vertical']), random.randint(0,9), random.randint(0,9)
-            
-            #LLAMAMOS A LA FUNCION BARCO_CABE PARA COMPROBAR SI CABE EL BARCO
-            if barco_cabe(barco_len, fila, columna, direccion): 
-                
-                #LLAMAMOS A LA FUNCION BARCO_SUPERPUESTO
-                if barco_superpuesto(tablero, fila, columna, direccion, barco_len) == False: 
-                    
-                    #COLOCAMOS BARCO, CADA POSICION SE REPRESENTA CON LA INICIAL DE CADA TIPO DE BARCO:
-                    #F:FRAGATA, D:DESTRUCTOR, A:ACORAZADO, P:PORTAAVIONES
-                    if direccion == 'horizontal':
-                        for i in range(columna, columna + barco_len):
-                            if barco_len == 1:
-                                tablero[fila][i] = 'F'
-                            elif barco_len == 2:
-                                tablero[fila][i] = 'D'
-                            elif barco_len == 3:
-                                tablero[fila][i] = 'A'
-                            elif barco_len == 4:
-                                tablero[fila][i] = 'P'
-                    else:
-                        for i in range(fila, fila + barco_len):
-                            if barco_len == 1:
-                                tablero[i][columna] = 'F'
-                            elif barco_len == 2:
-                                tablero[i][columna] = 'D'
-                            elif barco_len == 3:
-                                tablero[i][columna] = 'A'
-                            elif barco_len == 4:
-                                tablero[i][columna] = 'P'
-                    break
-                
-                
-def barco_cabe(barco_len, fila, columna, direccion):
-#FUNCION PARA COMPROBAR SI EL BARCO CABE 
-#VARIABLES: LAS ESLORAS DE LOS BARCOS, LA FILA, LA COLUMNA Y LA DIRECCION
-    if direccion == 'horizontal':
-        if columna + barco_len >= 10:
-            return False
-        else:
-            return True
-    else:
-        if fila + barco_len >= 10:
-            return False
-        else:
-            return True
+    def coloca_barcos_ale(self):
+        #FUNCION: COLOCAMOS LOS BARCOS ALEATORIOS DE LA MAQUINA
+        #VARIABLES: LA ENTRADA ES EL NOMBRE DE LA VARIABLE DEL TABLERO QUE QUIERAS
+
+        #BUCLE A TRAVES DE LAS ESLORAS DE LOS BARCOS
+        for barco_len in barcos_esloras:
+
+            #HACEMOS UN BUCLE PARA COMPROBAR QUE EL BARCO CABE Y NO PISA A OTRO BARCO. SI SE CUMPLEN, COLOCAMOS
+            while True:
+                direccion, fila, columna = random.choice(['horizontal', 'vertical']), random.randint(0,9), random.randint(0,9)
+
+                #LLAMAMOS A LA FUNCION BARCO_CABE PARA COMPROBAR SI CABE EL BARCO
+                if self.barco_cabe(barco_len, fila, columna, direccion): 
+
+                    #LLAMAMOS A LA FUNCION BARCO_SUPERPUESTO
+                    if self.barco_superpuesto(self, fila, columna, direccion, barco_len) == False: 
+
+                        if direccion == 'horizontal':
+                            for i in range(columna, columna + barco_len):
+                                if barco_len == 1:
+                                    self.mapa[fila][i] = 'F'
+                                elif barco_len == 2:
+                                    self.mapa[fila][i] = 'D'
+                                elif barco_len == 3:
+                                    self.mapa[fila][i] = 'A'
+                                elif barco_len == 4:
+                                    self.mapa[fila][i] = 'P'
+                        else:
+                            for i in range(fila, fila + barco_len):
+                                if barco_len == 1:
+                                    self.mapa[i][columna] = 'F'
+                                elif barco_len == 2:
+                                    self.mapa[i][columna] = 'D'
+                                elif barco_len == 3:
+                                    self.mapa[i][columna] = 'A'
+                                elif barco_len == 4:
+                                    self.mapa[i][columna] = 'P'
+                        break
+                        
 
 
-def barco_superpuesto(tablero, fila, columna, direccion, barco_len):
-#FUNCION PARA COMPROBAR SI YA HAY ALGUN BARCO EN ESA POSICION
-#VARIABLES DE ENTRADA: TABLERO QUE QUEREMOS USAR, FILA SELECCIONADA, COLUMNA, DIRECCION Y LONGITUD DEL BARCO
-    if direccion == 'horizontal':
-        for i in range(columna, columna + barco_len):
-            if tablero[fila][i] == 'F' or tablero[fila][i] == 'D' or tablero[fila][i] == 'A' or tablero[fila][i] == 'P':
+    def barco_cabe(self, barco_len, fila, columna, direccion):
+    #FUNCION PARA COMPROBAR SI EL BARCO CABE 
+    #VARIABLES: LAS ESLORAS DE LOS BARCOS, LA FILA, LA COLUMNA Y LA DIRECCION
+        if direccion == 'horizontal':
+            if columna + barco_len >= len(self.coord_long):
+                return False
+            else:
                 return True
-    else:
-        for i in range(fila, fila + barco_len):
-            if tablero[i][columna] == 'F' or tablero[i][columna] == 'D' or tablero[i][columna] == 'A' or tablero[i][columna] == 'P':
+        else:
+            if fila + barco_len >= len(self.coord_lat):
+                return False
+            else:
                 return True
-    return False
 
-#LLAMAMOS A LA FUNCION coloca_barcos_ale PARA COLOCAR LOS BARCOS
-coloca_barcos_ale(tablero_defensa_maquina)
 
-#LLAMAMOS A LA FUNCION pinta_tablero PARA MOSTRAR EL TABLERO CON LOS BARCOS COLOCADOS DE FORMA ALEATORIA
-pinta_tablero(tablero_defensa_maquina)
+    def barco_superpuesto(self, fila, columna, direccion, barco_len):
+    #FUNCION PARA COMPROBAR SI YA HAY ALGUN BARCO EN ESA POSICION
+    #VARIABLES DE ENTRADA: TABLERO QUE QUEREMOS USAR, FILA SELECCIONADA, COLUMNA, DIRECCION Y LONGITUD DEL BARCO
+        if direccion == 'horizontal':
+            for i in range(columna, columna + barco_len):
+                if self.mapa[fila][i] == 'F' or self.mapa[fila][i] == 'D' or self.mapa[fila][i] == 'A' or self.mapa[fila][i] == 'P':
+                    return True
+        else:
+            for i in range(fila, fila + barco_len):
+                if self.mapa[i][columna] == 'F' or self.mapa[i][columna] == 'D' or self.mapa[i][columna] == 'A' or self.mapa[i][columna] == 'P':
+                    return True
+        return False
+
+
+tab_maquina = Tablero(['A','B','C','D','E','F','G','H','I','J'], [0 ,1 ,2, 3, 4, 5, 6, 7 , 8 , 9])
+print(tab_maquina.mapa)
+tab_maquina.coloca_barcos_ale()    
+print(tab_maquina.mapa)
